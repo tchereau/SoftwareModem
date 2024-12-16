@@ -17,11 +17,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install Visual Studio Build Tools
+    - name: Install Visual Studio Build Tools with MSBuild and .NET Framework
       run: |
         choco install visualstudio2022buildtools -y
-        choco install visualstudio2022-workload-msbuild -y
-        choco install visualstudio2022-workload-netframework -y
+        "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify \
+          --quiet --wait \
+          --add Microsoft.VisualStudio.Workload.MSBuildTools \
+          --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools
 
     - name: Add MSBuild to PATH
       run: |
