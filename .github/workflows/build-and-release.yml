@@ -21,13 +21,17 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '4.5.x'
+
+    - name: Install .NET Framework Developer Pack
+      run: |
+        choco install netfx-4.5.2-devpack -y
 
     - name: Restore dependencies
       run: dotnet restore SoftwareModem.sln
 
     - name: Build solution
-      run: dotnet build SoftwareModem.sln --configuration Release
+      run: msbuild SoftwareModem.sln /p:Configuration=Release
 
     - name: Publish binaries
       run: dotnet publish SoftwareModem/SoftwareModem.csproj --configuration Release --output ./publish
