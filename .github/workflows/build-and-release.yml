@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
@@ -18,23 +17,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '4.5.x'
-
     - name: Install .NET Framework Developer Pack
       run: |
         choco install netfx-4.5.2-devpack -y
 
     - name: Restore dependencies
-      run: dotnet restore SoftwareModem.sln
+      run: msbuild /t:restore SoftwareModem.sln
 
     - name: Build solution
       run: msbuild SoftwareModem.sln /p:Configuration=Release
 
     - name: Publish binaries
-      run: dotnet publish SoftwareModem/SoftwareModem.csproj --configuration Release --output ./publish
+      run: msbuild SoftwareModem.sln /p:Configuration=Release /p:OutputPath=./publish
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
