@@ -1,0 +1,60 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore SoftwareModem.sln
+
+    - name: Build solution
+      run: dotnet build SoftwareModem.sln --configuration Release
+
+    - name: Publish binaries
+      run: dotnet publish SoftwareModem/SoftwareModem.csproj --configuration Release --output ./publish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: SoftwareModem
+        path: ./publish
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: SoftwareModem
+
+    - name: Create GitHub Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: SoftwareModem
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: v1.0.0
+        name: SoftwareModem v1.0.0
+        body: |
+          Initial release of the SoftwareModem project.
